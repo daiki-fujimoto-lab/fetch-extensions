@@ -35,6 +35,9 @@ BROWSERS = {
         "darwin": os.path.expanduser("~/Library/Application Support/Firefox/Profiles"),
         "linux": os.path.expanduser("~/.config/mozilla/firefox"),
     },
+    "safari": {
+        "darwin": os.path.expanduser("~/Library/Safari/Extensions"),
+    }
 }
 
 def copy_folder(src, dest):
@@ -61,6 +64,13 @@ def backup_extension_data():
         user_path = paths.get(platform)
         if not user_path or not os.path.exists(user_path):
             continue
+
+        if browser == "safari":
+            # Safari extensions are stored differently; back up the entire folder
+            backup_dir = os.path.join(BACKUP_PATH, browser)
+            print(f"Backing up Safari extensions...")
+            copy_folder(user_path, backup_dir)
+            continue  # Skip the extension ID loop since Safari works differently
         
         for profile in os.listdir(user_path):
             profile_path = os.path.join(user_path, profile)

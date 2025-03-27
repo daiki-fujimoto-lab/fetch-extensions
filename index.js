@@ -87,6 +87,9 @@ const BROWSERS = {
     ),
     linux: path.join(os.homedir(), ".mozilla", "firefox"),
   },
+  safari: {
+    darwin: path.join(os.homedir(), "Library", "Safari", "Extensions"),
+  },
 };
 
 // Function to copy folders
@@ -115,6 +118,14 @@ const backupExtensionData = () => {
   Object.entries(BROWSERS).forEach(([browser, paths]) => {
     const userPath = paths[process.platform]; // Get OS-specific path
     if (!fs.existsSync(userPath)) return;
+
+    if (browser === "safari") {
+      // Safari: Backup the entire extensions directory
+      const backupDir = path.join(BACKUP_PATH, browser);
+      console.log(`Backing up Safari extensions...`);
+      copyFolderSync(userPath, backupDir);
+      return;
+    }
 
     fs.readdirSync(userPath).forEach((profile) => {
       EXTENSION_IDS.forEach((extensionID) => {
